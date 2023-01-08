@@ -108,20 +108,20 @@ ORDER BY 2,3
 -- Creating a CTE to use for a Rolling Count Function
 -- CTE number of Columns need to be the same as oringial query
 
---WITH PopvsVax (continent, location, date, population, new_vaccinations, RollingCount)
---AS
---(
---SELECT Deaths.continent, Deaths.location, Deaths.date, Deaths.population, Vax.new_vaccinations,
---SUM(Cast(Vax.new_vaccinations as bigint)) OVER (Partition by Deaths.location ORDER BY Deaths.location, 
---Deaths.date) AS RollingCount
---FROM PortfolioProject..CovidDeaths AS Deaths
---Join PortfolioProject..CovidVaccinations AS Vax
---	ON Deaths.location = Vax.location
---	and Deaths.date = Vax.date
---WHERE Deaths.continent is not null
---)
---SELECT *
---FROM PopvsVax
+WITH PopvsVax (continent, location, date, population, new_vaccinations, RollingCount)
+AS
+(
+SELECT Deaths.continent, Deaths.location, Deaths.date, Deaths.population, Vax.new_vaccinations,
+SUM(Cast(Vax.new_vaccinations as bigint)) OVER (Partition by Deaths.location ORDER BY Deaths.location, 
+Deaths.date) AS RollingCount
+FROM PortfolioProject..CovidDeaths AS Deaths
+Join PortfolioProject..CovidVaccinations AS Vax
+	ON Deaths.location = Vax.location
+	and Deaths.date = Vax.date
+WHERE Deaths.continent is not null
+)
+SELECT *
+FROM PopvsVax
 
 -- 12. 
 -- Using my CTE to Create a function to show percentage vaxxed 
@@ -172,9 +172,9 @@ FROM #PercentVaccinated
 -- Creating View(s) to store data for visualizations 
 -- In another Query, but added to this repository to see
 
---CREATE VIEW TotalDeathCount AS
---SELECT location, MAX(cast(total_deaths as bigint)) AS TotalDeathCount
---FROM PortfolioProject..CovidDeaths
---WHERE continent is null
---GROUP BY location
-----ORDER BY TotalDeathCount desc
+CREATE VIEW TotalDeathCount AS
+SELECT location, MAX(cast(total_deaths as bigint)) AS TotalDeathCount
+FROM PortfolioProject..CovidDeaths
+WHERE continent is null
+GROUP BY location
+ORDER BY TotalDeathCount desc
